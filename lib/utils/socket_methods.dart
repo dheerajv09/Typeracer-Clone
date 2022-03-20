@@ -17,7 +17,17 @@ class SocketMethods {
     }
   }
 
-  // game update listener
+  //join game
+  joinGame(String gameId, String nickname) {
+    if (nickname.isNotEmpty && gameId.isNotEmpty) {
+      _socketClient.emit('join-game', {
+        'nickname': nickname,
+        'gameId': gameId,
+      });
+    }
+  }
+
+  // listeners
   updateGameListener(BuildContext context) {
     _socketClient.on('updateGame', (data) {
       final gameStateProvider =
@@ -35,5 +45,16 @@ class SocketMethods {
         _isPlaying = true;
       }
     });
+  }
+
+  notCorrectGameListener(BuildContext context) {
+    _socketClient.on(
+      'notCorrectGame',
+      (data) => ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(data),
+        ),
+      ),
+    );
   }
 }
