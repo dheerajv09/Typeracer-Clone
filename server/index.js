@@ -69,7 +69,87 @@ io.on("connection", (socket) => {
       console.log(e);
     }
   });
+
+  // timer listener
+  socket.on("timer", async ({ playerId, gameID }) => {
+    let countDown = 5;
+    let game = await Game.findById(gameID);
+    let player = game.players.id(playerId);
+
+    if (player.isPartyLeader) {
+      let timerId = setInterval(async () => {
+        if (countDown >= 0) {
+          io.to(gameID).emit("timer", {
+            countDown,
+            msg: "Game Starting",
+          });
+          console.log(countDown);
+          countDown--;
+        } else {
+          game.isJoin = false;
+          game = await game.save();
+          io.to(gameID).emit("updateGame", game);
+          startGameClock(gameID);
+          clearInterval(timerId);
+        }
+      }, 1000);
+    }
+  });
 });
+
+const startGameClock = async (gameID) => {
+  let game = await Game.findById(gameID);
+  game.startTime = new Date().getTime();
+  game = await game.save();
+
+  let time = 120;
+
+  let timerId = setInterval(
+    (function gameIntervalFunc() {
+      if (time >= 0) {
+        const timeFormat = calculateTime(time);
+        io.to(gameID).emit("timer", {
+          countDown: timeFormat,
+          msg: "Time Remaining",
+        });
+        console.log(time);
+        time--;
+      } else {
+        (async () => {
+          try {
+            let endTime = new Date().getTime();
+            let game = await Game.findById(gameID);
+            let { startTime } = game;
+            game.isOver = true;
+            game.players.forEach((player, index) => {
+              if (player.WPM === -1) {
+                game.players[index].WPM = calculateWPM(
+                  endTime,
+                  startTime,
+                  player
+                );
+              }
+            });
+            game = await game.save();
+            io.to(gameID).emit("updateGame", game);
+            clearInterval(timerId);
+          } catch (e) {
+            console.log(e);
+          }
+        })();
+      }
+      return gameIntervalFunc;
+    })(),
+    1000
+  );
+};
+
+const calculateTime = (time) => {
+  let min = Math.floor(time / 60);
+  let sec = time % 60;
+  return `${min}:${sec < 10 ? "0" + sec : sec}`;
+};
+
 
 mongoose
   .connect(DB)
