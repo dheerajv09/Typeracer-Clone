@@ -5,7 +5,7 @@ import '../providers/client_state_provider.dart';
 import '../providers/game_state_provider.dart';
 import 'socket_client.dart';
 
-class SocketMethods {
+class SocketService {
   final _socketClient = SocketClient.instance.socket!;
   bool _isPlaying = false;
 
@@ -32,7 +32,7 @@ class SocketMethods {
   updateGameListener(BuildContext context) {
     _socketClient.on('updateGame', (data) {
       final gameStateProvider =
-          Provider.of<GameStateProvider>(context, listen: false)
+          Provider.of<GameStateController>(context, listen: false)
               .updateGameState(
         id: data['_id'],
         players: data['players'],
@@ -59,6 +59,28 @@ class SocketMethods {
     );
   }
 
+  updateTimer(BuildContext context) {
+    final clientStateProvider =
+        Provider.of<ClientStateController>(context, listen: false);
+    _socketClient.on('timer', (data) {
+      clientStateProvider.setClientState(data);
+    });
+  }
+
+  updateGame(BuildContext context) {
+    _socketClient.on('updateGame', (data) {
+      final gameStateProvider =
+          Provider.of<GameStateController>(context, listen: false)
+              .updateGameState(
+        id: data['_id'],
+        players: data['players'],
+        isJoin: data['isJoin'],
+        words: data['words'],
+        isOver: data['isOver'],
+      );
+    });
+  }
+
   startTimer(playerId, gameID) {
     _socketClient.emit(
       'timer',
@@ -69,25 +91,17 @@ class SocketMethods {
     );
   }
 
-  updateTimer(BuildContext context) {
-    final clientStateProvider =
-        Provider.of<ClientStateProvider>(context, listen: false);
-    _socketClient.on('timer', (data) {
-      clientStateProvider.setClientState(data);
+  sendUserInput(String value, String gameID) {
+    _socketClient.emit('userInput', {
+      'userInput': value,
+      'gameID': gameID,
     });
   }
 
-  updateGame(BuildContext context) {
-    _socketClient.on('updateGame', (data) {
-      final gameStateProvider =
-          Provider.of<GameStateProvider>(context, listen: false)
-              .updateGameState(
-        id: data['_id'],
-        players: data['players'],
-        isJoin: data['isJoin'],
-        words: data['words'],
-        isOver: data['isOver'],
-      );
-    });
+  gameFinishedListener() {
+    _socketClient.on(
+      'done',
+      (data) => _socketClient.off('timer'),
+    );
   }
 }

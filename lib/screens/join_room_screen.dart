@@ -14,7 +14,7 @@ class JoinRoomScreen extends StatefulWidget {
 class _JoinRoomScreenState extends State<JoinRoomScreen> {
   final _nameController = TextEditingController();
   final _gameIdController = TextEditingController();
-  final SocketMethods _socketMethods = SocketMethods();
+  final SocketService _socketMethods = SocketService();
 
   @override
   void initState() {
@@ -59,7 +59,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
                 ),
                 CustomTextField(
                   controller: _nameController,
-                  hintText: 'Enter your nickname',
+                  hintText: 'Enter your user name',
                 ),
                 const SizedBox(
                   height: 20,

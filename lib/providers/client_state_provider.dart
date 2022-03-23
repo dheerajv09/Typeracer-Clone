@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/client_state.dart';
 
-class ClientStateProvider extends ChangeNotifier {
+class ClientStateController extends ChangeNotifier {
   ClientState _clientState = ClientState(
     timer: {
       'countDown': '',

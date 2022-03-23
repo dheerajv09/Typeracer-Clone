@@ -27,20 +27,30 @@ class HomeScreen extends StatelessWidget {
               SizedBox(
                 height: size.height * 0.1,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  CustomButton(
-                    text: 'Create',
-                    onTap: () => Navigator.pushNamed(context, '/create-room'),
-                    isHome: true,
-                  ),
-                  CustomButton(
-                    text: 'Join',
-                    onTap: () => Navigator.pushNamed(context, '/join-room'),
-                    isHome: true,
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        text: 'Create',
+                        onTap: () =>
+                            Navigator.pushNamed(context, '/create-room'),
+                        isHome: true,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: CustomButton(
+                        text: 'Join',
+                        onTap: () => Navigator.pushNamed(context, '/join-room'),
+                        isHome: true,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),

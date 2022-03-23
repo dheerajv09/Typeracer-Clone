@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../models/game_state.dart';
 
-class GameStateProvider extends ChangeNotifier {
+class GameStateController extends ChangeNotifier {
   GameState _gameState = GameState(
     id: '',
     players: [],

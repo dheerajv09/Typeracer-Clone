@@ -13,7 +13,7 @@ class CreateRoomScreen extends StatefulWidget {
 
 class _CreateRoomScreenState extends State<CreateRoomScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final SocketMethods _socketMethods = SocketMethods();
+  final SocketService _socketMethods = SocketService();
 
   @override
   void initState() {
@@ -57,7 +57,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                 ),
                 CustomTextField(
                   controller: _nameController,
-                  hintText: 'Enter your nickname',
+                  hintText: 'Enter your user name',
                 ),
                 const SizedBox(
                   height: 30,

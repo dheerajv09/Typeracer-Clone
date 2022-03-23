@@ -95,6 +95,30 @@ io.on("connection", (socket) => {
       }, 1000);
     }
   });
+
+  socket.on("userInput", async ({ userInput, gameID }) => {
+    let game = await Game.findById(gameID);
+    if (!game.isJoin && !game.isOver) {
+      let player = game.players.find(
+        (playerr) => playerr.socketID === socket.id
+      );
+
+      if (game.words[player.currentWordIndex] === userInput.trim()) {
+        player.currentWordIndex = player.currentWordIndex + 1;
+        if (player.currentWordIndex !== game.words.length) {
+          game = await game.save();
+          io.to(gameID).emit("updateGame", game);
+        } else {
+          let endTime = new Date().getTime();
+          let { startTime } = game;
+          player.WPM = calculateWPM(endTime, startTime, player);
+          game = await game.save();
+          socket.emit("done");
+          io.to(gameID).emit("updateGame", game);
+        }
+      }
+    }
+  });
 });
 
 const startGameClock = async (gameID) => {
@@ -150,6 +174,13 @@ const calculateTime = (time) => {
   return `${min}:${sec < 10 ? "0" + sec : sec}`;
 };
 
+const calculateWPM = (endTime, startTime, player) => {
+  const timeTakenInSec = (endTime - startTime) / 1000;
+  const timeTaken = timeTakenInSec / 60;
+  let wordsTyped = player.currentWordIndex;
+  const WPM = Math.floor(wordsTyped / timeTaken);
+  return WPM;
+};
 
 mongoose
   .connect(DB)

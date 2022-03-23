@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:typeracer_clone/providers/client_state_provider.dart';
 
 import 'providers/game_state_provider.dart';
 import 'screens/create_room_screen.dart';
+import 'screens/game_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/join_room_screen.dart';
 
@@ -19,7 +21,10 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => GameStateProvider(),
+          create: (context) => GameStateController(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ClientStateController(),
         ),
       ],
       child: MaterialApp(
@@ -39,6 +44,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-//username - dheerajv09
-//password - typeracer_clone_dheerajv09_mongodb
